@@ -1,0 +1,535 @@
+{% extends "base.html" %}
+
+{% block title %}Manage Faculty - Admin Dashboard{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2>Manage Faculty Profiles</h2>
+        <a href="{{ url_for('admin.dashboard') }}" class="btn btn-secondary">
+            <i class="fas fa-arrow-left"></i> Back to Dashboard
+        </a>
+    </div>
+
+    {% with messages = get_flashed_messages(with_categories=true) %}
+    {% if messages %}
+    {% for category, message in messages %}
+    <div class="alert alert-{{ category }} alert-dismissible fade show" role="alert">
+        {{ message }}
+        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+    </div>
+    {% endfor %}
+    {% endif %}
+    {% endwith %}
+
+    <!-- Search and Filter Form -->
+    <div class="card mb-4">
+        <div class="card-body">
+            <form method="GET" action="{{ url_for('admin.manage_faculty') }}" class="row g-3">
+                <div class="col-md-5">
+                    <div class="input-group">
+                        <span class="input-group-text"><i class="fas fa-search"></i></span>
+                        <input type="text" class="form-control" name="search"
+                            placeholder="Search by name, email, or designation..." value="{{ search_query }}">
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <select class="form-select" name="department_id">
+                        <option value="">All Departments</option>
+                        {% for dept in departments %}
+                        <option value="{{ dept.id }}" {% if selected_department_id==dept.id %}selected{% endif %}>{{
+                            dept.name }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="col-md-2">
+                    <select class="form-select" name="sort_by">
+                        <option value="name" {% if sort_by=='name' %}selected{% endif %}>Sort by Name</option>
+                        <option value="department" {% if sort_by=='department' %}selected{% endif %}>Sort by School
+                        </option>
+                    </select>
+                </div>
+                <div class="col-md-2 d-grid">
+                    <button type="submit" class="btn btn-primary">Apply</button>
+                    <!-- <a href="{{ url_for('admin.manage_faculty') }}" class="btn btn-outline-secondary mt-2">Reset</a> -->
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Faculty List -->
+    <div class="card mb-4">
+        <div class="card-header d-flex justify-content-between align-items-center">
+            <h5 class="mb-0">Faculty Members ({{ faculty_list|length }})</h5>
+            {% if search_query or selected_department_id %}
+            <a href="{{ url_for('admin.manage_faculty') }}" class="btn btn-sm btn-outline-secondary">Clear Filters</a>
+            {% endif %}
+        </div>
+        <div class="card-body">
+            <div class="table-responsive">
+                <table class="table table-hover">
+                    <thead>
+                        <tr>
+                            <th>Photo</th>
+                            <th>Name</th>
+                            <th>Designation</th>
+                            <th>Department</th>
+                            <th>Email</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for faculty in faculty_list %}
+                        <tr>
+                            <td>
+                                {% if faculty.profile_image %}
+                                <img src="{{ faculty.profile_image }}" alt="{{ faculty.full_name }}"
+                                    style="width: 50px; height: 50px; object-fit: cover; border-radius: 50%;">
+                                {% else %}
+                                <div
+                                    style="width: 50px; height: 50px; background: #ddd; border-radius: 50%; display: flex; align-items: center; justify-content: center;">
+                                    <i class="fas fa-user"></i>
+                                </div>
+                                {% endif %}
+                            </td>
+                            <td>{{ faculty.full_name }}</td>
+                            <td>{{ faculty.designation or 'Not set' }}</td>
+                            <td>{{ faculty.department.name if faculty.department else 'Not assigned' }}</td>
+                            <td>{{ faculty.email }}</td>
+                            <td>
+                                <button class="btn btn-sm btn-primary" data-bs-toggle="modal"
+                                    data-bs-target="#editModal{{ faculty.id }}">
+                                    <i class="fas fa-edit"></i> Edit
+                                </button>
+                                <button class="btn btn-sm btn-success ms-1" data-bs-toggle="modal"
+                                    data-bs-target="#enrollFaceModal{{ faculty.id }}">
+                                    <i class="fas fa-camera"></i> Enroll Face
+                                </button>
+                            </td>
+                        </tr>
+
+
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- Pagination or other footer content if needed -->
+            {% if not faculty_list %}
+            <div class="text-center py-4">
+                <p class="text-muted">No faculty members found.</p>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+
+<!-- Modals Section (Outside Table) -->
+{% for faculty in faculty_list %}
+<!-- Edit Modal for each faculty -->
+<div class="modal fade" id="editModal{{ faculty.id }}" tabindex="-1">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <form method="POST" action="{{ url_for('admin.update_faculty', faculty_id=faculty.id) }}"
+                enctype="multipart/form-data">
+                <div class="modal-header">
+                    <h5 class="modal-title">Edit Faculty Profile - {{ faculty.full_name }}</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">Full Name</label>
+                            <input type="text" class="form-control" name="full_name" value="{{ faculty.full_name }}"
+                                required>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">Email</label>
+                            <input type="email" class="form-control" name="email" value="{{ faculty.email }}" required>
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">Designation</label>
+                            <input type="text" class="form-control" name="designation"
+                                value="{{ faculty.designation or '' }}" placeholder="e.g., Associate Professor">
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">Department</label>
+                            <select class="form-select" name="department_id">
+                                <option value="">Select Department</option>
+                                {% for dept in departments %}
+                                <option value="{{ dept.id }}" {% if faculty.department_id==dept.id %}selected{% endif
+                                    %}>
+                                    {{ dept.name }}
+                                </option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label">Education</label>
+                        <textarea class="form-control" name="education" rows="2"
+                            placeholder="e.g., Ph.D. (IIT Kanpur), M.Tech (VTU)">{{ faculty.education or '' }}</textarea>
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label">Bio / About</label>
+                        <textarea class="form-control" name="bio" rows="3"
+                            placeholder="Brief biography or background">{{ faculty.bio or '' }}</textarea>
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label">Research Interests</label>
+                        <textarea class="form-control" name="research_interests" rows="2"
+                            placeholder="Research areas and interests">{{ faculty.research_interests or '' }}</textarea>
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label">Profile Image</label>
+                        {% if faculty.profile_image %}
+                        <div class="mb-2">
+                            <img src="{{ faculty.profile_image }}" alt="{{ faculty.full_name }}"
+                                style="max-width: 200px; max-height: 200px; object-fit: cover;">
+                        </div>
+                        {% endif %}
+                        <input type="file" class="form-control" name="profile_image" accept="image/*">
+                        <small class="text-muted">Upload a new image to replace the current
+                            one</small>
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label">University Profile URL</label>
+                        <input type="url" class="form-control" name="university_profile_url"
+                            value="{{ faculty.university_profile_url or '' }}"
+                            placeholder="https://university.edu/profile">
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button type="submit" class="btn btn-primary">
+                        <i class="fas fa-save"></i> Save Changes
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- Face Enrollment Modal for each faculty -->
+<div class="modal fade" id="enrollFaceModal{{ faculty.id }}" tabindex="-1">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Enroll Face - {{ faculty.full_name }}</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <div class="text-center mb-3">
+                    <p class="text-muted">Choose a method to enroll face</p>
+                </div>
+
+                <!-- Tabs for Camera vs Upload -->
+                <ul class="nav nav-tabs mb-3" role="tablist">
+                    <li class="nav-item" role="presentation">
+                        <button class="nav-link active" id="camera-tab{{ faculty.id }}" data-bs-toggle="tab"
+                            data-bs-target="#camera{{ faculty.id }}" type="button" role="tab">
+                            <i class="fas fa-camera"></i> Use Camera
+                        </button>
+                    </li>
+                    <li class="nav-item" role="presentation">
+                        <button class="nav-link" id="upload-tab{{ faculty.id }}" data-bs-toggle="tab"
+                            data-bs-target="#upload{{ faculty.id }}" type="button" role="tab">
+                            <i class="fas fa-upload"></i> Upload Image
+                        </button>
+                    </li>
+                </ul>
+
+                <div class="tab-content">
+                    <!-- Camera Tab -->
+                    <div class="tab-pane fade show active" id="camera{{ faculty.id }}" role="tabpanel">
+                        <!-- Camera Preview -->
+                        <div class="position-relative mb-3" style="max-width: 640px; margin: 0 auto;">
+                            <video id="enrollVideo{{ faculty.id }}" autoplay playsinline
+                                style="width: 100%; border-radius: 8px; background: #000;"></video>
+                            <canvas id="enrollCanvas{{ faculty.id }}"
+                                style="position: absolute; top: 0; left: 0; width: 100%; height: 100%;"></canvas>
+                        </div>
+                    </div>
+
+                    <!-- Upload Tab -->
+                    <div class="tab-pane fade" id="upload{{ faculty.id }}" role="tabpanel">
+                        <div class="text-center mb-3">
+                            <input type="file" id="manualUpload{{ faculty.id }}" accept="image/*"
+                                class="form-control mb-3" onchange="handleManualUpload({{ faculty.id }}, event)">
+                            <small class="text-muted">Select a clear photo showing the
+                                face</small>
+                        </div>
+                        <div id="uploadPreview{{ faculty.id }}" style="display: none;" class="text-center">
+                            <img id="uploadImage{{ faculty.id }}" style="max-width: 400px; border-radius: 8px;">
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Status Messages -->
+                <div id="enrollStatus{{ faculty.id }}" class="alert" style="display: none;">
+                </div>
+
+                <!-- Captured Image Preview -->
+                <div id="capturedPreview{{ faculty.id }}" style="display: none;" class="text-center mb-3">
+                    <p class="fw-bold">Captured Image:</p>
+                    <img id="capturedImage{{ faculty.id }}" style="max-width: 300px; border-radius: 8px;">
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                <button type="button" class="btn btn-primary" id="captureBtn{{ faculty.id }}"
+                    onclick="captureFacultyFace({{ faculty.id }})">
+                    <i class="fas fa-camera"></i> Capture Face
+                </button>
+                <button type="button" class="btn btn-success" id="enrollBtn{{ faculty.id }}" style="display: none;"
+                    onclick="enrollFacultyFace({{ faculty.id }})">
+                    <i class="fas fa-check"></i> Enroll Face
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+{% endfor %}
+<style>
+    .table td {
+        vertical-align: middle;
+    }
+</style>
+
+{% endblock %}
+
+{% block extra_js %}
+<script src="https://cdn.jsdelivr.net/npm/face-api.js@0.22.2/dist/face-api.min.js" defer></script>
+<script>
+    let currentStream = null;
+    let capturedImageData = null;
+    let modelsLoaded = false;
+
+    // Load face-api models
+    async function loadFaceModels() {
+        if (modelsLoaded) return;
+        try {
+            await faceapi.nets.tinyFaceDetector.loadFromUri('/static/models');
+            modelsLoaded = true;
+            console.log('Face detection models loaded');
+        } catch (error) {
+            console.error('Error loading face models:', error);
+        }
+    }
+
+    // Initialize camera when modal is shown
+    document.addEventListener('DOMContentLoaded', function () {
+        // Load models on page load
+        loadFaceModels();
+
+        // Add event listeners for all enrollment modals
+        document.querySelectorAll('[id^="enrollFaceModal"]').forEach(modal => {
+            modal.addEventListener('shown.bs.modal', function () {
+                const facultyId = this.id.replace('enrollFaceModal', '');
+                startCamera(facultyId);
+            });
+
+            modal.addEventListener('hidden.bs.modal', function () {
+                stopCamera();
+                const facultyId = this.id.replace('enrollFaceModal', '');
+                resetEnrollmentUI(facultyId);
+            });
+        });
+    });
+
+    async function startCamera(facultyId) {
+        try {
+            const video = document.getElementById(`enrollVideo${facultyId}`);
+            const canvas = document.getElementById(`enrollCanvas${facultyId}`);
+
+            currentStream = await navigator.mediaDevices.getUserMedia({
+                video: { width: 640, height: 480 }
+            });
+
+            video.srcObject = currentStream;
+
+            // Start face detection
+            video.addEventListener('play', () => {
+                detectFaces(facultyId);
+            });
+        } catch (error) {
+            console.error('Error accessing camera:', error);
+            showStatus(facultyId, 'Error accessing camera. Please check permissions.', 'danger');
+        }
+    }
+
+    function stopCamera() {
+        if (currentStream) {
+            currentStream.getTracks().forEach(track => track.stop());
+            currentStream = null;
+        }
+    }
+
+    async function detectFaces(facultyId) {
+        const video = document.getElementById(`enrollVideo${facultyId}`);
+        const canvas = document.getElementById(`enrollCanvas${facultyId}`);
+
+        if (!video || !canvas) return;
+
+        const displaySize = { width: video.videoWidth, height: video.videoHeight };
+        faceapi.matchDimensions(canvas, displaySize);
+
+        const detectInterval = setInterval(async () => {
+            if (!currentStream) {
+                clearInterval(detectInterval);
+                return;
+            }
+
+            try {
+                const detections = await faceapi.detectAllFaces(video, new faceapi.TinyFaceDetectorOptions());
+                const resizedDetections = faceapi.resizeResults(detections, displaySize);
+
+                const ctx = canvas.getContext('2d');
+                ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+                // Draw face boxes
+                resizedDetections.forEach(detection => {
+                    const box = detection.box;
+                    ctx.strokeStyle = '#00ff00';
+                    ctx.lineWidth = 2;
+                    ctx.strokeRect(box.x, box.y, box.width, box.height);
+                });
+            } catch (error) {
+                console.error('Face detection error:', error);
+            }
+        }, 100);
+    }
+
+    function captureFacultyFace(facultyId) {
+        const video = document.getElementById(`enrollVideo${facultyId}`);
+        const canvas = document.createElement('canvas');
+
+        canvas.width = video.videoWidth;
+        canvas.height = video.videoHeight;
+        canvas.getContext('2d').drawImage(video, 0, 0);
+
+        // Convert to blob
+        canvas.toBlob(blob => {
+            capturedImageData = blob;
+
+            // Show preview
+            const preview = document.getElementById(`capturedPreview${facultyId}`);
+            const img = document.getElementById(`capturedImage${facultyId}`);
+            img.src = URL.createObjectURL(blob);
+            preview.style.display = 'block';
+
+            // Show enroll button, hide capture button
+            document.getElementById(`captureBtn${facultyId}`).style.display = 'none';
+            document.getElementById(`enrollBtn${facultyId}`).style.display = 'inline-block';
+
+            showStatus(facultyId, 'Face captured! Click "Enroll Face" to save.', 'success');
+        }, 'image/jpeg', 0.95);
+    }
+
+    function handleManualUpload(facultyId, event) {
+        const file = event.target.files[0];
+        if (!file) return;
+
+        // Validate file type
+        if (!file.type.startsWith('image/')) {
+            showStatus(facultyId, 'Please select a valid image file.', 'danger');
+            return;
+        }
+
+        // Validate file size (max 5MB)
+        if (file.size > 5 * 1024 * 1024) {
+            showStatus(facultyId, 'Image size must be less than 5MB.', 'danger');
+            return;
+        }
+
+        // Store the file as blob
+        capturedImageData = file;
+
+        // Show preview
+        const reader = new FileReader();
+        reader.onload = (e) => {
+            const preview = document.getElementById(`uploadPreview${facultyId}`);
+            const img = document.getElementById(`uploadImage${facultyId}`);
+            img.src = e.target.result;
+            preview.style.display = 'block';
+
+            // Show enroll button, hide capture button
+            document.getElementById(`captureBtn${facultyId}`).style.display = 'none';
+            document.getElementById(`enrollBtn${facultyId}`).style.display = 'inline-block';
+
+            showStatus(facultyId, 'Image uploaded! Click "Enroll Face" to save.', 'success');
+        };
+        reader.readAsDataURL(file);
+    }
+
+    async function enrollFacultyFace(facultyId) {
+        if (!capturedImageData) {
+            showStatus(facultyId, 'Please capture a face first.', 'warning');
+            return;
+        }
+
+        const enrollBtn = document.getElementById(`enrollBtn${facultyId}`);
+        enrollBtn.disabled = true;
+        enrollBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Enrolling...';
+
+        try {
+            const formData = new FormData();
+            formData.append('image', capturedImageData, 'face.jpg');
+
+            const response = await fetch(`/api/face/enroll/${facultyId}`, {
+                method: 'POST',
+                body: formData
+            });
+
+            const data = await response.json();
+
+            if (data.success) {
+                showStatus(facultyId, 'Face enrolled successfully! You can now close this window.', 'success');
+                setTimeout(() => {
+                    bootstrap.Modal.getInstance(document.getElementById(`enrollFaceModal${facultyId}`)).hide();
+                    location.reload();
+                }, 2000);
+            } else {
+                showStatus(facultyId, data.message || 'Error enrolling face. Please try again.', 'danger');
+                enrollBtn.disabled = false;
+                enrollBtn.innerHTML = '<i class="fas fa-check"></i> Enroll Face';
+            }
+        } catch (error) {
+            console.error('Error enrolling face:', error);
+            showStatus(facultyId, 'Error enrolling face. Please try again.', 'danger');
+            enrollBtn.disabled = false;
+            enrollBtn.innerHTML = '<i class="fas fa-check"></i> Enroll Face';
+        }
+    }
+
+    function showStatus(facultyId, message, type) {
+        const statusDiv = document.getElementById(`enrollStatus${facultyId}`);
+        statusDiv.className = `alert alert-${type}`;
+        statusDiv.textContent = message;
+        statusDiv.style.display = 'block';
+    }
+
+    function resetEnrollmentUI(facultyId) {
+        document.getElementById(`captureBtn${facultyId}`).style.display = 'inline-block';
+        document.getElementById(`enrollBtn${facultyId}`).style.display = 'none';
+        document.getElementById(`capturedPreview${facultyId}`).style.display = 'none';
+        document.getElementById(`enrollStatus${facultyId}`).style.display = 'none';
+
+        // Reset upload tab
+        const uploadInput = document.getElementById(`manualUpload${facultyId}`);
+        if (uploadInput) uploadInput.value = '';
+        const uploadPreview = document.getElementById(`uploadPreview${facultyId}`);
+        if (uploadPreview) uploadPreview.style.display = 'none';
+
+        capturedImageData = null;
+    }
+</script>
+{% endblock %}

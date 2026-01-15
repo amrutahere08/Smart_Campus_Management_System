@@ -1,0 +1,326 @@
+{% extends "base.html" %}
+
+{% block title %}Login - Smart Campus{% endblock %}
+
+{% block content %}
+<!-- Minimal Modern Background -->
+<div class="login-background"></div>
+
+<div class="login-container">
+    <div class="login-card">
+        <div class="login-header">
+            <div class="login-icon">
+                <i class="fas fa-user-circle"></i>
+            </div>
+            <h1>Welcome Back</h1>
+            <p>Login to access Smart Campus</p>
+        </div>
+
+        <div class="login-body">
+            <form method="POST" action="{{ url_for('auth.login') }}" id="loginForm">
+                <div class="form-group">
+                    <label class="form-label" for="username">
+                        <i class="fas fa-user"></i> Username
+                    </label>
+                    <input type="text" class="form-control" id="username" name="username" required>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label" for="password">
+                        <i class="fas fa-lock"></i> Password
+                    </label>
+                    <input type="password" class="form-control" id="password" name="password" required>
+                </div>
+
+                <button type="submit" class="btn-login" id="loginBtn">
+                    <span class="btn-text">Login</span>
+                    <span class="btn-loader"></span>
+                    <i class="fas fa-arrow-right btn-icon"></i>
+                </button>
+            </form>
+
+
+        </div>
+    </div>
+</div>
+
+<style>
+    /* Minimal Modern Background with Campus Image */
+    .login-background {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: url("{{ url_for('static', filename='images/campus_bg.jpg') }}") center center / cover no-repeat;
+        z-index: -1;
+    }
+
+    .login-background::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: linear-gradient(135deg, rgba(15, 23, 42, 0.75) 0%, rgba(30, 41, 59, 0.85) 100%);
+        backdrop-filter: blur(3px);
+    }
+
+    /* Login Container */
+    .login-container {
+        min-height: calc(100vh - 70px);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 2rem;
+        animation: fadeIn 0.6s ease-out;
+        margin-top: 70px;
+    }
+
+    @keyframes fadeIn {
+        from {
+            opacity: 0;
+        }
+
+        to {
+            opacity: 1;
+        }
+    }
+
+    /* Login Card - Glassmorphism Design */
+    .login-card {
+        background: rgba(255, 255, 255, 0.1);
+        backdrop-filter: blur(20px) saturate(180%);
+        -webkit-backdrop-filter: blur(20px) saturate(180%);
+        border-radius: 20px;
+        box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
+        max-width: 400px;
+        width: 100%;
+        overflow: hidden;
+        animation: slideUp 0.6s cubic-bezier(0.34, 1.56, 0.64, 1);
+        border: 1px solid rgba(255, 255, 255, 0.2);
+    }
+
+    @keyframes slideUp {
+        from {
+            opacity: 0;
+            transform: translateY(30px);
+        }
+
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+
+    /* Login Header - Glassy */
+    .login-header {
+        text-align: center;
+        padding: 3rem 2rem 2rem;
+        background: rgba(255, 255, 255, 0.08);
+        border-bottom: 1px solid rgba(255, 255, 255, 0.15);
+    }
+
+    .login-icon {
+        width: 70px;
+        height: 70px;
+        margin: 0 auto 1.25rem;
+        background: linear-gradient(135deg, #3b82f6, #8b5cf6);
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        box-shadow: 0 8px 24px rgba(59, 130, 246, 0.4), 0 0 0 4px rgba(255, 255, 255, 0.1);
+    }
+
+    .login-icon i {
+        font-size: 2.25rem;
+        color: white;
+        filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.2));
+    }
+
+    .login-header h1 {
+        font-size: 2rem;
+        font-weight: 700;
+        color: white;
+        margin-bottom: 0.75rem;
+        text-shadow: 0 2px 10px rgba(0, 0, 0, 0.5), 0 4px 20px rgba(0, 0, 0, 0.3);
+        letter-spacing: -0.02em;
+    }
+
+    .login-header p {
+        color: rgba(255, 255, 255, 0.95);
+        font-size: 1rem;
+        text-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
+    }
+
+    /* Login Body */
+    .login-body {
+        padding: 2rem;
+    }
+
+    .form-group {
+        margin-bottom: 1.25rem;
+    }
+
+    .login-body .form-label {
+        display: block;
+        margin-bottom: 0.5rem;
+        color: white !important;
+        font-weight: 600;
+        font-size: 0.875rem;
+        text-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
+    }
+
+    .login-body .form-label i {
+        color: white !important;
+        margin-right: 0.5rem;
+    }
+
+    .form-control {
+        width: 100%;
+        padding: 0.75rem 1rem;
+        border: 2px solid rgba(255, 255, 255, 0.2);
+        border-radius: 8px;
+        font-size: 0.95rem;
+        transition: all 0.3s ease;
+        background: rgba(255, 255, 255, 0.1);
+        color: white;
+    }
+
+    .form-control::placeholder {
+        color: rgba(255, 255, 255, 0.5);
+    }
+
+    .form-control:focus {
+        outline: none;
+        border-color: rgba(59, 130, 246, 0.6);
+        background: rgba(255, 255, 255, 0.15);
+        box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.2);
+    }
+
+    /* Login Button - Minimal */
+    .btn-login {
+        width: 100%;
+        padding: 0.875rem 1.5rem;
+        background: linear-gradient(135deg, #3b82f6, #8b5cf6);
+        color: white;
+        border: none;
+        border-radius: 8px;
+        font-size: 1rem;
+        font-weight: 600;
+        cursor: pointer;
+        position: relative;
+        overflow: hidden;
+        transition: all 0.3s ease;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 0.75rem;
+        margin-top: 1.5rem;
+        box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3);
+    }
+
+    .btn-login:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 6px 20px rgba(59, 130, 246, 0.4);
+    }
+
+    .btn-login:active {
+        transform: scale(0.98);
+    }
+
+    /* Loading Animation */
+    .btn-login.loading .btn-text {
+        opacity: 0;
+    }
+
+    .btn-login.loading .btn-icon {
+        opacity: 0;
+    }
+
+    .btn-loader {
+        display: none;
+        width: 20px;
+        height: 20px;
+        border: 3px solid rgba(255, 255, 255, 0.3);
+        border-top-color: white;
+        border-radius: 50%;
+        animation: spin 0.8s linear infinite;
+    }
+
+    .btn-login.loading .btn-loader {
+        display: block;
+    }
+
+    @keyframes spin {
+        to {
+            transform: rotate(360deg);
+        }
+    }
+
+    .btn-text,
+    .btn-icon {
+        position: relative;
+        z-index: 1;
+        transition: all 0.3s ease;
+    }
+
+    .btn-icon {
+        transition: transform 0.3s ease;
+    }
+
+    .btn-login:hover .btn-icon {
+        transform: translateX(3px);
+    }
+
+    /* Register Link */
+    .register-link {
+        text-align: center;
+        margin-top: 1.5rem;
+        color: rgba(255, 255, 255, 0.8);
+        font-size: 0.9rem;
+    }
+
+    .register-link a {
+        color: #60a5fa;
+        text-decoration: none;
+        font-weight: 600;
+        transition: all 0.3s ease;
+    }
+
+    .register-link a:hover {
+        color: #93c5fd;
+        text-decoration: underline;
+    }
+
+    /* Responsive */
+    @media (max-width: 768px) {
+        .login-container {
+            padding: 1rem;
+        }
+
+        .login-card {
+            margin: 0;
+        }
+
+        .login-header h1 {
+            font-size: 1.5rem;
+        }
+    }
+</style>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        const loginBtn = document.getElementById('loginBtn');
+        const loginForm = document.getElementById('loginForm');
+
+        // Form submit animation
+        loginForm.addEventListener('submit', function (e) {
+            loginBtn.classList.add('loading');
+            loginBtn.disabled = true;
+        });
+    });
+</script>
+{% endblock %}

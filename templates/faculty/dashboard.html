@@ -1,0 +1,373 @@
+{% extends "base.html" %}
+
+{% block title %}Faculty Dashboard - Smart Campus{% endblock %}
+
+{% block content %}
+<style>
+    .faculty-dashboard {
+        background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
+        min-height: 100vh;
+        padding: 2rem 0;
+    }
+
+    .welcome-card {
+        background: rgba(255, 255, 255, 0.95);
+        backdrop-filter: blur(10px);
+        border-radius: 20px;
+        padding: 2rem;
+        margin-bottom: 2rem;
+        box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+        text-align: center;
+    }
+
+    .feature-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+        gap: 1.5rem;
+        margin-bottom: 2rem;
+    }
+
+    .feature-card {
+        background: white;
+        border-radius: 15px;
+        padding: 2rem;
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+        transition: all 0.3s ease;
+        text-decoration: none;
+        color: inherit;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        text-align: center;
+    }
+
+    .feature-card:hover {
+        transform: translateY(-10px);
+        box-shadow: 0 15px 40px rgba(0, 0, 0, 0.3);
+    }
+
+    .feature-icon {
+        font-size: 3rem;
+        margin-bottom: 1rem;
+        background: linear-gradient(135deg, #667eea, #764ba2);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+    }
+
+    .feature-title {
+        font-size: 1.3rem;
+        font-weight: 700;
+        margin-bottom: 0.5rem;
+        color: #1e293b;
+    }
+
+    .feature-desc {
+        color: #64748b;
+        font-size: 0.95rem;
+    }
+
+    .stats-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        gap: 1.5rem;
+        margin-bottom: 2rem;
+    }
+
+    .stat-card {
+        background: linear-gradient(135deg, #667eea, #764ba2);
+        color: white;
+        border-radius: 15px;
+        padding: 1.5rem;
+        text-align: center;
+    }
+
+    .stat-number {
+        font-size: 2.5rem;
+        font-weight: 700;
+        margin-bottom: 0.5rem;
+    }
+
+    .stat-label {
+        font-size: 0.95rem;
+        opacity: 0.9;
+    }
+</style>
+
+<div class="faculty-dashboard">
+    <div class="container" style="max-width: 1200px;">
+        <!-- Welcome Card -->
+        <div class="welcome-card">
+            <h1
+                style="font-size: 2.5rem; background: linear-gradient(135deg, #667eea, #764ba2); -webkit-background-clip: text; -webkit-text-fill-color: transparent; margin-bottom: 0.5rem;">
+                Welcome back, {{ faculty_name }}!
+            </h1>
+            <p style="color: #64748b; font-size: 1.1rem;">
+                Faculty Dashboard - Manage your classes and students
+            </p>
+        </div>
+
+        <!-- Quick Stats -->
+        <div class="stats-grid">
+            <div class="stat-card">
+                <div class="stat-number">{{ total_students or 0 }}</div>
+                <div class="stat-label">Total Students</div>
+            </div>
+            <div class="stat-card" style="background: linear-gradient(135deg, #10b981, #059669);">
+                <div class="stat-number">{{ total_classes or 0 }}</div>
+                <div class="stat-label">Your Classes</div>
+            </div>
+            <div class="stat-card" style="background: linear-gradient(135deg, #f59e0b, #d97706);">
+                <div class="stat-number">{{ upcoming_events|length }}</div>
+                <div class="stat-label">Upcoming Events</div>
+            </div>
+            <div class="stat-card" style="background: linear-gradient(135deg, #3b82f6, #2563eb);">
+                <div class="stat-number">{{ attendance_today or 0 }}</div>
+                <div class="stat-label">Attendance Today</div>
+            </div>
+        </div>
+
+
+        <!-- Quick Access Card -->
+        <div
+            style="background: white; border-radius: 15px; padding: 2rem; box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2); margin-bottom: 2rem;">
+            <h3 style="color: #1e293b; margin-bottom: 1.5rem; font-size: 1.5rem;">Quick Access</h3>
+            <div class="feature-grid">
+                <!-- View Attendance -->
+                <a href="{{ url_for('faculty.attendance') }}" class="feature-card">
+                    <div class="feature-title">View Attendance</div>
+                    <div class="feature-desc">View and manage student attendance records</div>
+                </a>
+            </div>
+        </div>
+
+        <!-- Attention Monitoring Section -->
+        <div
+            style="background: white; border-radius: 15px; padding: 2rem; box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2); margin-bottom: 2rem;">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem;">
+                <h3 style="color: #1e293b; margin: 0; font-size: 1.5rem;">
+                    📊 Student Attention Monitoring
+                </h3>
+                <button id="toggleMonitoring" class="btn btn-primary"
+                    style="background: linear-gradient(135deg, #667eea, #764ba2); border: none; padding: 0.75rem 1.5rem; border-radius: 10px; font-weight: 600;">
+                    Start Monitoring
+                </button>
+            </div>
+
+            <!-- Alert Banner -->
+            <div id="alertBanner"
+                style="display: none; background: linear-gradient(135deg, #ef4444, #dc2626); color: white; padding: 1rem 1.5rem; border-radius: 10px; margin-bottom: 1.5rem; font-weight: 600; text-align: center;">
+                ⚠️ Alert: More than 10 students are not paying attention!
+            </div>
+
+            <!-- Stats Display -->
+            <div
+                style="display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 1rem; margin-bottom: 1.5rem;">
+                <div
+                    style="background: linear-gradient(135deg, #3b82f6, #2563eb); color: white; padding: 1.5rem; border-radius: 10px; text-align: center;">
+                    <div style="font-size: 2rem; font-weight: 700;" id="totalFaces">0</div>
+                    <div style="font-size: 0.9rem; opacity: 0.9;">Total Students</div>
+                </div>
+                <div
+                    style="background: linear-gradient(135deg, #10b981, #059669); color: white; padding: 1.5rem; border-radius: 10px; text-align: center;">
+                    <div style="font-size: 2rem; font-weight: 700;" id="focusedCount">0</div>
+                    <div style="font-size: 0.9rem; opacity: 0.9;">Focused</div>
+                </div>
+                <div
+                    style="background: linear-gradient(135deg, #ef4444, #dc2626); color: white; padding: 1.5rem; border-radius: 10px; text-align: center;">
+                    <div style="font-size: 2rem; font-weight: 700;" id="distractedCount">0</div>
+                    <div style="font-size: 0.9rem; opacity: 0.9;">Distracted</div>
+                </div>
+            </div>
+
+            <!-- Camera Feed (Hidden) -->
+            <div style="position: relative; display: none;" id="cameraContainer">
+                <video id="cameraFeed" autoplay
+                    style="width: 100%; max-width: 640px; border-radius: 10px; display: block; margin: 0 auto;"></video>
+                <div style="text-align: center; margin-top: 1rem; color: #64748b;">
+                    <small>Camera feed is processed locally. Analysis runs every 3 seconds.</small>
+                </div>
+            </div>
+
+            <!-- Status Message -->
+            <div id="statusMessage" style="text-align: center; color: #64748b; padding: 2rem;">
+                Click "Start Monitoring" to begin analyzing student attention in real-time.
+            </div>
+        </div>
+
+        <!-- Upcoming Events -->
+        <div style="background: white; border-radius: 15px; padding: 2rem; box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);">
+            <h3 style="color: #1e293b; margin-bottom: 1.5rem; font-size: 1.5rem;">
+                Upcoming Events
+            </h3>
+            {% if upcoming_events %}
+            <div style="display: grid; gap: 1rem;">
+                {% for event in upcoming_events %}
+                <div
+                    style="padding: 1.5rem; background: linear-gradient(135deg, rgba(102, 126, 234, 0.05), rgba(118, 75, 162, 0.05)); border-radius: 10px; border-left: 4px solid #667eea;">
+                    <h4 style="color: #1e293b; margin-bottom: 0.5rem;">{{ event.title }}</h4>
+                    <p style="color: #64748b; margin-bottom: 0.5rem;">
+                        {{ event.location }} | {{ event.event_date|datetime('%B %d, %Y at %I:%M %p') }}
+                    </p>
+                    <p style="color: #475569;">{{ event.description }}</p>
+                </div>
+                {% endfor %}
+            </div>
+            {% else %}
+            <div style="text-align: center; padding: 3rem; color: #94a3b8;">
+
+                <p style="font-size: 1.1rem;">No upcoming events at this time.</p>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+
+<script>
+    // Attention Monitoring Script
+    let isMonitoring = false;
+    let monitoringInterval = null;
+    let cameraStream = null;
+    let sessionId = null;
+    let logCounter = 0;
+
+    const toggleBtn = document.getElementById('toggleMonitoring');
+    const video = document.getElementById('cameraFeed');
+    const cameraContainer = document.getElementById('cameraContainer');
+    const statusMessage = document.getElementById('statusMessage');
+    const alertBanner = document.getElementById('alertBanner');
+    const totalFacesEl = document.getElementById('totalFaces');
+    const focusedCountEl = document.getElementById('focusedCount');
+    const distractedCountEl = document.getElementById('distractedCount');
+
+    toggleBtn.addEventListener('click', async () => {
+        if (!isMonitoring) {
+            await startMonitoring();
+        } else {
+            stopMonitoring();
+        }
+    });
+
+    async function startMonitoring() {
+        try {
+            // Request camera access
+            cameraStream = await navigator.mediaDevices.getUserMedia({
+                video: { width: 640, height: 480 }
+            });
+            video.srcObject = cameraStream;
+
+            // Update UI
+            isMonitoring = true;
+            toggleBtn.textContent = 'Stop Monitoring';
+            toggleBtn.style.background = 'linear-gradient(135deg, #ef4444, #dc2626)';
+            cameraContainer.style.display = 'block';
+            statusMessage.textContent = 'Monitoring active... Analyzing student attention every 3 seconds.';
+
+            // Generate session ID
+            sessionId = generateUUID();
+
+            // Start analysis loop (every 3 seconds)
+            monitoringInterval = setInterval(analyzeAttention, 3000);
+            analyzeAttention(); // Run immediately
+
+        } catch (error) {
+            console.error('Error accessing camera:', error);
+            alert('Could not access camera. Please ensure camera permissions are granted.');
+        }
+    }
+
+    function stopMonitoring() {
+        // Stop camera
+        if (cameraStream) {
+            cameraStream.getTracks().forEach(track => track.stop());
+            cameraStream = null;
+        }
+
+        // Stop interval
+        if (monitoringInterval) {
+            clearInterval(monitoringInterval);
+            monitoringInterval = null;
+        }
+
+        // Reset UI
+        isMonitoring = false;
+        toggleBtn.textContent = 'Start Monitoring';
+        toggleBtn.style.background = 'linear-gradient(135deg, #667eea, #764ba2)';
+        cameraContainer.style.display = 'none';
+        statusMessage.textContent = 'Click "Start Monitoring" to begin analyzing student attention in real-time.';
+        alertBanner.style.display = 'none';
+
+        // Reset stats
+        totalFacesEl.textContent = '0';
+        focusedCountEl.textContent = '0';
+        distractedCountEl.textContent = '0';
+    }
+
+    async function analyzeAttention() {
+        try {
+            // Capture frame from video
+            const canvas = document.createElement('canvas');
+            canvas.width = video.videoWidth;
+            canvas.height = video.videoHeight;
+            canvas.getContext('2d').drawImage(video, 0, 0);
+
+            // Convert to blob
+            const blob = await new Promise(resolve => canvas.toBlob(resolve, 'image/jpeg', 0.8));
+
+            // Send to backend
+            const formData = new FormData();
+            formData.append('image', blob, 'frame.jpg');
+            formData.append('session_id', sessionId);
+
+            // Log to database every 5 analysis cycles (every 15 seconds)
+            logCounter++;
+            if (logCounter >= 5) {
+                formData.append('log', 'true');
+                logCounter = 0;
+            }
+
+            const response = await fetch('/faculty/api/monitor-attention', {
+                method: 'POST',
+                body: formData
+            });
+
+            const data = await response.json();
+
+            if (data.success) {
+                // Update stats
+                totalFacesEl.textContent = data.total_faces;
+                focusedCountEl.textContent = data.focused_count;
+                distractedCountEl.textContent = data.distracted_count;
+
+                // Show/hide alert
+                if (data.alert) {
+                    alertBanner.style.display = 'block';
+                } else {
+                    alertBanner.style.display = 'none';
+                }
+
+                // Update status message
+                if (data.total_faces === 0) {
+                    statusMessage.textContent = 'No students detected. Ensure camera is positioned to capture the classroom.';
+                } else {
+                    const percentage = data.total_faces > 0 ? Math.round((data.focused_count / data.total_faces) * 100) : 0;
+                    statusMessage.textContent = `Monitoring ${data.total_faces} student(s) - ${percentage}% focused`;
+                }
+            } else {
+                console.error('Analysis failed:', data.error);
+            }
+
+        } catch (error) {
+            console.error('Error analyzing attention:', error);
+        }
+    }
+
+    function generateUUID() {
+        return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function (c) {
+            const r = Math.random() * 16 | 0;
+            const v = c === 'x' ? r : (r & 0x3 | 0x8);
+            return v.toString(16);
+        });
+    }
+</script>
+
+{% endblock %}

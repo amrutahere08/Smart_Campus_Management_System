@@ -1,0 +1,112 @@
+{
+  "university": {
+    "name": "Chanakya University",
+    "location": "Bangalore, Karnataka, India",
+    "about": "Know More Chanakya University is a pioneering exemplar of the vision of a Multidisciplinary University as elucidated in the new National Education Policy (NEP 2020). Know More Chanakya University is deeply committed to the creation of a foremost knowledge movement that will harness India’s lasting civilizational wisdom to serve society and humanity selflessly. Welcome to the School of Arts, Humanities, and Social Sciences You will find here a very refreshing and a very deep engagement with society, culture,... Read More Welcome to the School of Management Sciences The School of Management Sciences adopts multidisciplinary approach that encompasses in depth domain knowledge with a vast breadth... Read More Welcome to the School of Mathematics and Natural Sciences, where curiosity meets discovery, and knowledge transcends boundaries. At the undergraduate level, we offer comprehensive programmes... Read More In an ever-changing world, where the rule of law is both a shield and a sword, ou",
+    "website": "https://chanakyauniversity.edu.in"
+  },
+  "schools": [
+    {
+      "name": "School of Arts, Humanities and Social Sciences",
+      "short_name": "SAHSS",
+      "dean": "Prof. Sandeep Nair",
+      "dean_location": "Cabin 428, 4th Floor, Academic Block 1",
+      "description": "  Visiting Faculty, School of Arts, Humanities and Social Sciences",
+      "programs": [
+        "Undergraduate Programmes",
+        "Postgraduate Programmes",
+        "Doctoral Programmes"
+      ],
+      "faculty_highlights": [
+        "Faculty members"
+      ],
+      "url": "https://chanakyauniversity.edu.in/schools/school-of-arts-humanities-and-social-sciences/"
+    },
+    {
+      "name": "School of Management Sciences",
+      "short_name": "SMS",
+      "dean": "Dr. Dinesh Shenoy",
+      "dean_location": "Cabin 427, 4th Floor, Academic Block 1",
+      "description": "Professor of Organization Theory at Sungkonghoe University Academic Dean & DBA Program Manager at SBS Swiss Business School Chair, Department of Accounting at The University of Texas at Arlington - College of Business",
+      "programs": [
+        "Undergraduate Programmes",
+        "Postgraduate Programmes",
+        "Doctoral Programmes"
+      ],
+      "faculty_highlights": [
+        "Faculty members"
+      ],
+      "url": "https://chanakyauniversity.edu.in/schools/school-of-management-sciences/"
+    },
+    {
+      "name": "School of Mathematics and Natural Sciences",
+      "short_name": "SMNS",
+      "dean": "Not specified",
+      "dean_location": "Please contact school office",
+      "description": "Honorary Professor Ph.D., Michigan State University, USA Pro Vice-Chancellor, Professor & Dean, School of Biosciences & School of Mathematics and Natural Sciences",
+      "programs": [
+        "Undergraduate Programmes",
+        "Postgraduate Programmes",
+        "Doctoral Programmes"
+      ],
+      "faculty_highlights": [
+        "Faculty members"
+      ],
+      "url": "https://chanakyauniversity.edu.in/schools/school-of-mathematics-and-natural-sciences/"
+    },
+    {
+      "name": "School of Law, Governance and Public Policy",
+      "short_name": "SLGPP",
+      "dean": "Prof. Chetan Basavaraj Singai",
+      "dean_location": "Cabin 426, 4th Floor, Academic Block 1",
+      "description": "Member-HR, Capacity Building Commission, Government of India Professor Emeritus, National Museum of Ethnology & Professor, Graduate University for Advanced Studies Former Director, Tata Institute of Social Sciences (TISS), Mumbai.",
+      "programs": [
+        "Undergraduate Programmes",
+        "Postgraduate Programmes",
+        "Doctoral Programmes"
+      ],
+      "faculty_highlights": [
+        "Faculty members"
+      ],
+      "url": "https://chanakyauniversity.edu.in/schools/school-of-public-policy-legal-studies/"
+    },
+    {
+      "name": "School of Biosciences",
+      "short_name": "SB",
+      "dean": "Not specified",
+      "dean_location": "Please contact school office",
+      "description": "Welcome to the School of Biosciences at Chanakya University, where we are committed to providing an exceptional educational experience in the field of biosciences Know More Welcome to the School of Biosciences at Chanakya University, where we are committed to providing an exceptional educational experience in the exciting areas of biosciences. Our school is dedicated to fostering a passion for scientific inquiry and discovery in our students, and we strive to prepare them for a variety of career",
+      "programs": [],
+      "faculty_highlights": [
+        "Faculty members"
+      ],
+      "url": "https://chanakyauniversity.edu.in/bioscience/"
+    },
+    {
+      "name": "School of Engineering",
+      "short_name": "SE",
+      "dean": "Not specified",
+      "dean_location": "Academic Block 2",
+      "description": "Professor of Applied mechanics, Dean Alumni and Corporate Relations, IIT Madras Professor, Department of Computer Science and Automation, IISc Bangalore Professor, Mechanical Engineering Department, IIT Kanpur",
+      "programs": [
+        "Undergraduate Programmes",
+        "Postgraduate Programmes",
+        "Doctoral Programmes"
+      ],
+      "faculty_highlights": [
+        "Faculty members"
+      ],
+      "url": "https://chanakyauniversity.edu.in/schools/school-of-engineering/"
+    }
+  ],
+  "programs": [],
+  "faculty": [],
+  "admissions": {
+    "process": "“A World Of Transformation Through Knowledge.” Chanakya University is a global learning destination that is deeply committed to the creation of a foremost knowledge movement in which students rise higher with ideas and achieve sustained success with abundant wisdom (jñāna), indomitable will (ichhā) and meaningful action (kriyā). Truly Indian in spirit, the University will act equally as a citizen of the world. Get all the details you need about chanakya university. Download our brochure to explore degree programs, campus facilities, and more. At Chanakya University we offer exceptional teaching and conduct impactful research across broad spectrum of disciplines. Explore more about our faculty and their work. The quality of various programmes and university Our students are exposed to some ",
+    "website": "https://chanakyauniversity.edu.in/admissions/",
+    "contact": "admissions@chanakyauniversity.edu.in"
+  },
+  "facilities": [],
+  "research": [],
+  "events": []
+}

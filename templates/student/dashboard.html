@@ -1,0 +1,336 @@
+{% extends "base.html" %}
+
+{% block title %}Student Dashboard - Smart Campus{% endblock %}
+
+{% block content %}
+<!-- Clean Background -->
+<div class="dashboard-background"></div>
+
+<div class="dashboard-container">
+    <!-- Welcome Section -->
+    <section class="welcome-section">
+        <div class="welcome-card">
+            <h1>Welcome back, {{ student_name }}!</h1>
+            <p>Ready to make today amazing?</p>
+        </div>
+    </section>
+
+    <!-- Quick Stats -->
+    <section class="stats-section">
+        <div class="stats-grid">
+            <div class="stat-card">
+                <div class="stat-number">{{ upcoming_events|length if upcoming_events else 0 }}</div>
+                <div class="stat-label">Upcoming Events</div>
+            </div>
+
+            <div class="stat-card">
+                <div class="stat-number">Active</div>
+                <div class="stat-label">Account Status</div>
+            </div>
+
+            <div class="stat-card">
+                <div class="stat-number">Student</div>
+                <div class="stat-label">Role</div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Upcoming Events -->
+    <section class="events-section">
+        <div class="section-header">
+            <h2>Upcoming Events</h2>
+            <a href="{{ url_for('student.events') }}" class="view-all-link">View All →</a>
+        </div>
+
+        <div class="events-grid">
+            {% if upcoming_events %}
+            {% for event in upcoming_events %}
+            <div class="event-card">
+                <div class="event-date-badge">
+                    <div class="date-day">{{ event.event_date.strftime('%d') }}</div>
+                    <div class="date-month">{{ event.event_date.strftime('%b') }}</div>
+                </div>
+                <div class="event-content">
+                    <h3>{{ event.title }}</h3>
+                    <div class="event-meta">
+                        <span class="event-time">{{ event.event_date.strftime('%I:%M %p') }}</span>
+                        <span class="event-location">{{ event.location }}</span>
+                    </div>
+                    <p class="event-description">{{ event.description[:100] }}{% if event.description|length > 100
+                        %}...{% endif %}</p>
+                </div>
+            </div>
+            {% endfor %}
+            {% else %}
+            <div class="no-events">
+                <h3>No Upcoming Events</h3>
+                <p>Check back later for new events!</p>
+            </div>
+            {% endif %}
+        </div>
+    </section>
+</div>
+
+<style>
+    /* Background */
+    .dashboard-background {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
+        z-index: -1;
+    }
+
+    /* Container */
+    .dashboard-container {
+        max-width: 1200px;
+        margin: 0 auto;
+        padding: 2rem;
+        margin-top: 70px;
+        min-height: calc(100vh - 70px);
+    }
+
+    /* Welcome Section */
+    .welcome-section {
+        margin-bottom: 2rem;
+    }
+
+    .welcome-card {
+        background: white;
+        border-radius: 20px;
+        padding: 4rem 2rem;
+        text-align: center;
+        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+        border: 1px solid #e2e8f0;
+    }
+
+    .welcome-card h1 {
+        font-size: 2.5rem;
+        font-weight: 700;
+        color: #1e293b;
+        margin-bottom: 0.75rem;
+        letter-spacing: -0.02em;
+    }
+
+    .welcome-card p {
+        font-size: 1.25rem;
+        color: #64748b;
+    }
+
+    /* Stats Section */
+    .stats-section {
+        margin-bottom: 2.5rem;
+    }
+
+    .stats-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+        gap: 1.5rem;
+    }
+
+    .stat-card {
+        background: white;
+        border-radius: 16px;
+        padding: 2.5rem 2rem;
+        text-align: center;
+        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+        border: 1px solid #e2e8f0;
+        transition: all 0.3s ease;
+    }
+
+    .stat-card:hover {
+        transform: translateY(-4px);
+        box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1);
+    }
+
+    .stat-number {
+        font-size: 3rem;
+        font-weight: 700;
+        color: #1e293b;
+        margin-bottom: 0.5rem;
+        line-height: 1;
+    }
+
+    .stat-label {
+        font-size: 1rem;
+        color: #64748b;
+        font-weight: 500;
+    }
+
+    /* Events Section */
+    .events-section {
+        margin-bottom: 2rem;
+    }
+
+    .section-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 1.5rem;
+    }
+
+    .section-header h2 {
+        font-size: 1.75rem;
+        font-weight: 700;
+        color: #1e293b;
+    }
+
+    .view-all-link {
+        color: #3b82f6;
+        text-decoration: none;
+        font-weight: 600;
+        font-size: 1rem;
+        transition: color 0.2s;
+    }
+
+    .view-all-link:hover {
+        color: #2563eb;
+    }
+
+    .events-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+        gap: 1.5rem;
+    }
+
+    .event-card {
+        background: white;
+        border-radius: 16px;
+        padding: 1.5rem;
+        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+        border: 1px solid #e2e8f0;
+        transition: all 0.3s ease;
+        position: relative;
+    }
+
+    .event-card:hover {
+        transform: translateY(-4px);
+        box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1);
+    }
+
+    .event-date-badge {
+        position: absolute;
+        top: 1.5rem;
+        right: 1.5rem;
+        width: 60px;
+        height: 60px;
+        background: linear-gradient(135deg, #3b82f6, #8b5cf6);
+        border-radius: 12px;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        color: white;
+    }
+
+    .date-day {
+        font-size: 1.5rem;
+        font-weight: 700;
+        line-height: 1;
+    }
+
+    .date-month {
+        font-size: 0.75rem;
+        font-weight: 600;
+        text-transform: uppercase;
+        margin-top: 0.25rem;
+    }
+
+    .event-content {
+        padding-right: 80px;
+    }
+
+    .event-content h3 {
+        font-size: 1.25rem;
+        font-weight: 700;
+        color: #1e293b;
+        margin-bottom: 0.75rem;
+    }
+
+    .event-meta {
+        display: flex;
+        gap: 1.5rem;
+        margin-bottom: 0.75rem;
+        font-size: 0.875rem;
+        color: #64748b;
+    }
+
+    .event-time {
+        font-weight: 600;
+        color: #3b82f6;
+    }
+
+    .event-description {
+        color: #64748b;
+        line-height: 1.6;
+        font-size: 0.9375rem;
+    }
+
+    /* No Events */
+    .no-events {
+        grid-column: 1 / -1;
+        text-align: center;
+        padding: 4rem 2rem;
+        background: white;
+        border-radius: 16px;
+        border: 1px solid #e2e8f0;
+    }
+
+    .no-events h3 {
+        font-size: 1.5rem;
+        font-weight: 700;
+        color: #1e293b;
+        margin-bottom: 0.5rem;
+    }
+
+    .no-events p {
+        color: #64748b;
+        font-size: 1rem;
+    }
+
+    /* Responsive */
+    @media (max-width: 768px) {
+        .dashboard-container {
+            padding: 1rem;
+        }
+
+        .welcome-card {
+            padding: 3rem 1.5rem;
+        }
+
+        .welcome-card h1 {
+            font-size: 2rem;
+        }
+
+        .welcome-card p {
+            font-size: 1.1rem;
+        }
+
+        .stats-grid {
+            grid-template-columns: 1fr;
+        }
+
+        .events-grid {
+            grid-template-columns: 1fr;
+        }
+
+        .section-header {
+            flex-direction: column;
+            align-items: flex-start;
+            gap: 1rem;
+        }
+
+        .event-content {
+            padding-right: 0;
+            padding-top: 70px;
+        }
+
+        .event-date-badge {
+            top: 1rem;
+            right: 1rem;
+        }
+    }
+</style>
+{% endblock %}
