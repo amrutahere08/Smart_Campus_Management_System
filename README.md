@@ -327,10 +327,10 @@ Contributions to improve the system are welcome. Please follow these guidelines:
 
 ## Acknowledgments
 
-This project was developed as part of the final year curriculum. Special thanks to:
-- The faculty advisors for their guidance
-- Open source communities for the libraries used
-- Team members who contributed to development and testing
+This project was developed as part of the MCA curriculum by a team of 2 members.We would like to express our gratitude to:
+- Our faculty advisors for their continuous guidance and support throughout the development process
+- The open source communities for providing excellent libraries and frameworks
+- Our college for providing the necessary infrastructure and resources
 
 ## License
 
