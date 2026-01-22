@@ -4,7 +4,7 @@
 
 The Smart Campus Monitoring System is a web-based application designed to streamline university operations through automation and artificial intelligence. This platform addresses common challenges in campus management by providing automated attendance tracking, intelligent query resolution, and comprehensive visitor management.
 
-Built as a final year project, this system demonstrates the practical application of machine learning and web development technologies to solve real-world problems in educational institutions.
+Built as an academic project, this system demonstrates the practical application of machine learning and web development technologies to solve real-world problems in educational institutions.
 
 ## Problem Statement
 
