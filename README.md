@@ -315,15 +315,7 @@ Potential improvements for future versions:
 - Biometric authentication options beyond face recognition
 - Integration with campus IoT devices for smart classroom management
 
-## Contributing
 
-Contributions to improve the system are welcome. Please follow these guidelines:
-
-1. Fork the repository
-2. Create a feature branch
-3. Make your changes with clear commit messages
-4. Test thoroughly before submitting
-5. Create a pull request with a detailed description
 
 ## Acknowledgments
 
